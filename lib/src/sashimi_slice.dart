@@ -8,11 +8,12 @@ import 'package:sashimi/sashimi.dart';
 /// Represents a slice of a [SashimiObject].
 /// {@endtemplate}
 class SashimiSlice<Owner extends SashimiObject> extends PositionComponent
-    with SashimiOwner<Owner>, HasAncestor<SashimiEngine> {
+    with SashimiOwner<Owner> {
   /// {@macro sashimi_slice}
   SashimiSlice({
     required Owner owner,
-  }) : super(anchor: Anchor.center) {
+    super.anchor = Anchor.center,
+  }) : super() {
     this.owner = owner;
   }
 
@@ -22,8 +23,8 @@ class SashimiSlice<Owner extends SashimiObject> extends PositionComponent
     size.setValues(owner.size.x, owner.size.y);
     scale.setValues(owner.scale.x, owner.scale.y);
     position.setValues(
-      sin(ancestor.viewfinder.angle) * priority + owner.position.x,
-      -cos(ancestor.viewfinder.angle) * priority + owner.position.y,
+      sin(owner.parent.viewfinder.angle) * priority + owner.position.x,
+      -cos(owner.parent.viewfinder.angle) * priority + owner.position.y,
     );
     angle = owner.angle;
   }

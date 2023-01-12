@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flame/components.dart';
@@ -37,6 +38,19 @@ class Model extends SashimiObject {
           sprite: sheet.getSpriteById(slices - i - 1),
         ),
     ];
+  }
+
+  @override
+  void update(double dt) {
+    // Get the first slice's priority which will be the bottom slide.
+    final priority = slices.first.priority;
+
+    // Set the controller position to the position of the bottom slice to ensure
+    // the correct logical position.
+    controller.position.setValues(
+      sin(parent.viewfinder.angle) * priority + position.x,
+      -cos(parent.viewfinder.angle) * priority + position.y,
+    );
   }
 
   @override

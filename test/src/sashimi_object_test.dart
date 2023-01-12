@@ -10,12 +10,20 @@ class _TestObject extends SashimiObject {
   _TestObject() : super(position: Vector3.zero(), size: Vector3.zero());
 
   @override
-  List<SashimiSlice<SashimiObject>> generateSlices() => [];
+  List<SashimiSlice<SashimiObject>> generateSlices() {
+    return [_TestSlice(owner: this)];
+  }
 
   @override
   void recalculate() => calculatingCalled = true;
 
   bool calculatingCalled = false;
+}
+
+class _TestSlice extends SashimiSlice<_TestObject> {
+  _TestSlice({
+    required super.owner,
+  });
 }
 
 void main() {
@@ -86,6 +94,26 @@ void main() {
 
         object.scale.setValues(10, 10, 10);
         expect(object.calculatingCalled, equals(true));
+      },
+    );
+
+    sashimiGame.testGameWidget(
+      'controller position equals bottom slice position',
+      setUp: (game, tester) => game.ensureAdd(_TestObject()),
+      verify: (game, tester) async {
+        final object = game.descendants().whereType<_TestObject>().first;
+        object
+          ..position.setValues(10, 10, 10)
+          ..angle = 10 * degrees2Radians;
+
+        game
+          ..update(0)
+          ..update(0);
+
+        final controller = object.controller;
+        final slice = object.slices.first;
+
+        expect(slice.position, closeToVector(controller.position));
       },
     );
 

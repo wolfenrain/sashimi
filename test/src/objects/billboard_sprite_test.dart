@@ -20,6 +20,7 @@ void main() {
             ),
           );
 
+          // We need to update twice to ensure the sprite is rendered correctly
           game
             ..update(0)
             ..update(0);

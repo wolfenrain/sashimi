@@ -27,7 +27,7 @@ class Model extends SashimiObject {
 
   @override
   List<SashimiSlice> generateSlices() {
-    final sheet = SpriteSheet(image: image, srcSize: size.xy);
+    final sheet = SpriteSheet(image: image, srcSize: sliceSize.xy);
     final slices = (image.height / sliceSize.y).ceil();
 
     return [

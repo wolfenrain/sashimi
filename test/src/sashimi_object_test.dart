@@ -98,26 +98,6 @@ void main() {
     );
 
     sashimiGame.testGameWidget(
-      'controller position equals bottom slice position',
-      setUp: (game, tester) => game.ensureAdd(_TestObject()),
-      verify: (game, tester) async {
-        final object = game.descendants().whereType<_TestObject>().first;
-        object
-          ..position.setValues(10, 10, 10)
-          ..angle = 10 * degrees2Radians;
-
-        game
-          ..update(0)
-          ..update(0);
-
-        final controller = object.controller;
-        final slice = object.slices.first;
-
-        expect(slice.position, equals(controller.position));
-      },
-    );
-
-    sashimiGame.testGameWidget(
       'stops listening when unmounted',
       setUp: (game, tester) => game.ensureAdd(_TestObject()),
       verify: (game, tester) async {

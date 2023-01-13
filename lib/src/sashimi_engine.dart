@@ -33,7 +33,7 @@ class SashimiEngine extends Component {
   /// This is the world that is rendered on the screen and does not have any
   /// logical behavior like collision detection, that is handled in the
   /// [_logicalWorld].
-  final _visualWorld = CullComponent(cullingEnabled: true);
+  final _visualWorld = CullComponent<SashimiSlice>(cullingEnabled: true);
 
   /// The world that contains all the logical components.
   ///
@@ -41,7 +41,7 @@ class SashimiEngine extends Component {
   /// collision detection. This world tends to have a smaller component list
   /// than the [_visualWorld] as it only has [SashimiController]s, which there
   /// is only one of per [SashimiObject].
-  final _logicalWorld = CullComponent();
+  final _logicalWorld = CullComponent<SashimiController>();
 
   /// Whether the visual world should cull components.
   bool get visualCulling => _visualWorld.cullingEnabled;

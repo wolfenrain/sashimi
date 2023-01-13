@@ -9,13 +9,13 @@ import 'package:sashimi/sashimi.dart';
 ///
 /// TODO(wolfen): this does not cull correct with rotation.
 /// {@endtemplate}
-class CullComponent extends Component
+class CullComponent<T extends SashimiOwner> extends Component
     with HasGameRef<SashimiGame>, HasAncestor<SashimiEngine> {
   CullComponent({this.cullingEnabled = false});
 
-  final List<SashimiOwner> _culledComponents = [];
+  final List<T> _culledComponents = [];
 
-  late final List<SashimiOwner> _components;
+  late final List<T> _components;
 
   /// If culling is enabled for this component.
   ///
@@ -24,12 +24,12 @@ class CullComponent extends Component
 
   @override
   Future<void>? onLoad() {
-    children.register<SashimiOwner>();
-    _components = children.query<SashimiOwner>();
+    children.register<T>();
+    _components = children.query<T>();
     return super.onLoad();
   }
 
-  Future<void>? addComponent(SashimiOwner component) async {
+  Future<void>? addComponent(T component) async {
     if (!cullingEnabled) return super.add(component);
     return _culledComponents.add(component);
   }
@@ -59,12 +59,12 @@ class CullComponent extends Component
     final viewport =
         Rect.fromLTRB(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y);
 
-    final removed = <SashimiOwner>[
+    final removed = <T>[
       for (final component in _components)
         if (!viewport.overlaps(component.toRect())) component,
     ]..forEach(super.remove);
 
-    final added = <SashimiOwner>[
+    final added = <T>[
       for (final component in _culledComponents.where((c) => c.parent == null))
         if (viewport.overlaps(component.toRect())) component,
     ]..forEach(super.add); // Bypass unimplemented add method.

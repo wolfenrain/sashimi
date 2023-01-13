@@ -67,4 +67,4 @@ git add pubspec.yaml CHANGELOG.md
 
 echo ""
 echo "Run the following command if you wish to commit the changes:"
-echo "git commit -m \"chore($package_name): $new_version\""
+echo "git commit -m \"chore: $new_version\""

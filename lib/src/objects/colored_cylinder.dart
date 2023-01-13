@@ -23,6 +23,13 @@ class ColoredCylinder extends SashimiObject {
   final List<Color> colors;
 
   @override
+  void update(double dt) {
+    // Update the position of the controller to match the bottom slice of the
+    // model (the first slice in the list).
+    controller.position.setFrom(slices.first.position);
+  }
+
+  @override
   List<SashimiSlice> generateSlices() {
     return [
       for (var i = 0; i < colors.length; i++)
@@ -31,15 +38,6 @@ class ColoredCylinder extends SashimiObject {
           color: colors[i],
         ),
     ];
-  }
-
-  @override
-  void recalculate() {
-    // TODO(wolfen): correct spacing logic.
-    final betweenSlices = size.z / colors.length * scale.z;
-    for (var i = 0; i < slices.length; i++) {
-      slices[i].priority = (position.z + i + betweenSlices * i).toInt();
-    }
   }
 }
 

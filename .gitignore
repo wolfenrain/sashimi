@@ -41,3 +41,7 @@ app.*.map.json
 
 # Test related
 coverage
+
+test/failures
+
+.test/test_runner.dart

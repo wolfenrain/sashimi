@@ -10,12 +10,20 @@ class _TestObject extends SashimiObject {
   _TestObject() : super(position: Vector3.zero(), size: Vector3.zero());
 
   @override
-  List<SashimiSlice<SashimiObject>> generateSlices() => [];
+  List<SashimiSlice<SashimiObject>> generateSlices() {
+    return [_TestSlice(owner: this)];
+  }
 
   @override
   void recalculate() => calculatingCalled = true;
 
   bool calculatingCalled = false;
+}
+
+class _TestSlice extends SashimiSlice<_TestObject> {
+  _TestSlice({
+    required super.owner,
+  });
 }
 
 void main() {
@@ -38,7 +46,7 @@ void main() {
       verify: (game, tester) async {
         final object = game.descendants().whereType<_TestObject>().first;
 
-        expect(object.slices, equals([]));
+        expect(object.slices.length, equals(1));
       },
     );
 

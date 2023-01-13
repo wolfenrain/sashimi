@@ -8,9 +8,7 @@ class _TestObject extends SashimiObject {
   _TestObject() : super(position: Vector3.zero(), size: Vector3.all(10));
 
   @override
-  List<SashimiSlice<SashimiObject>> generateSlices() {
-    return [];
-  }
+  List<SashimiSlice<SashimiObject>> generateSlices() => [];
 
   @override
   void recalculate() {}

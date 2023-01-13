@@ -26,6 +26,13 @@ class Model extends SashimiObject {
   final Vector2 sliceSize;
 
   @override
+  void update(double dt) {
+    // Update the position of the controller to match the bottom slice of the
+    // model (the first slice in the list).
+    controller.position.setFrom(slices.first.position);
+  }
+
+  @override
   List<SashimiSlice> generateSlices() {
     final sheet = SpriteSheet(image: image, srcSize: sliceSize.xy);
     final slices = (image.height / sliceSize.y).ceil();
@@ -37,18 +44,6 @@ class Model extends SashimiObject {
           sprite: sheet.getSpriteById(slices - i - 1),
         ),
     ];
-  }
-
-  @override
-  void recalculate() {
-    // TODO(wolfen): correct spacing logic.
-    final betweenSlices = size.z / (image.height / sliceSize.y) * scale.z;
-    var distance = 0.0;
-
-    for (var i = 0; i < slices.length; i++) {
-      slices[i].priority = (position.z + i + distance).toInt();
-      distance += betweenSlices;
-    }
   }
 }
 
@@ -63,7 +58,7 @@ class _SashimiSlice extends SashimiSlice<Model> {
   /// Paint with `isAntiAlias` to prevent sampling outside the image.
   ///
   /// See https://github.com/flutter/flutter/issues/67881 for more info.
-  final Paint paint = Paint()..isAntiAlias = false;
+  static final Paint paint = Paint()..isAntiAlias = false;
 
   @override
   void render(Canvas canvas) {

@@ -1,3 +1,5 @@
+// ignore_for_file: cascade_invocations
+
 import 'package:flame/extensions.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sashimi/sashimi.dart';
@@ -41,6 +43,21 @@ void main() {
         game.update(0);
         expect(slice.position, equals(Vector2(10, 10)));
         expect(slice.size, equals(Vector2.all(20)));
+      },
+    );
+
+    sashimiGame.testGameWidget(
+      'does not update values if owner is not mounted',
+      setUp: (game, tester) => game.ensureAdd(_TestObject()),
+      verify: (game, tester) async {
+        final object = game.descendants().whereType<_TestObject>().first;
+        final slice = object.slices.first;
+
+        object.removeFromParent();
+        game.update(0); // Simulate next tick
+
+        object.size.setValues(10, 10, 10);
+        expect(slice.size, equals(Vector2(0, 0)));
       },
     );
   });

@@ -20,6 +20,8 @@ class SashimiSlice<Owner extends SashimiObject> extends PositionComponent
   @override
   @mustCallSuper
   void update(double dt) {
+    if (!owner.isMounted) return;
+
     size.setValues(owner.size.x, owner.size.y);
     scale.setValues(owner.scale.x, owner.scale.y);
     position.setValues(

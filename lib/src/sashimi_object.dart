@@ -57,7 +57,14 @@ abstract class SashimiObject extends Component with ParentIsA<SashimiEngine> {
   List<SashimiSlice> generateSlices();
 
   /// Recalculates the priority of the slices.
-  void recalculate();
+  void recalculate() {
+    // TODO(wolfen): correct spacing logic.
+    final betweenSlices = size.z / slices.length * scale.z;
+
+    for (var i = 0; i < slices.length; i++) {
+      slices[i].priority = (position.z + i + betweenSlices * i).toInt();
+    }
+  }
 
   @override
   @mustCallSuper

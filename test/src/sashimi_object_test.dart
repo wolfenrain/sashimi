@@ -46,7 +46,7 @@ void main() {
       verify: (game, tester) async {
         final object = game.descendants().whereType<_TestObject>().first;
 
-        expect(object.slices, equals([]));
+        expect(object.slices.length, equals(1));
       },
     );
 
@@ -113,7 +113,7 @@ void main() {
         final controller = object.controller;
         final slice = object.slices.first;
 
-        expect(slice.position, closeToVector(controller.position));
+        expect(slice.position, equals(controller.position));
       },
     );
 

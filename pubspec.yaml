@@ -1,7 +1,7 @@
 name: sashimi
 description: A sprite stacking framework build on top of the Flame Engine.
 repository: https://github.com/wolfenrain/sashimi
-version: 0.1.0-dev.2
+version: 0.1.0-dev.3
 
 environment:
   sdk: ">=2.18.0 <3.0.0"

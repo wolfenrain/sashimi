@@ -1,5 +1,6 @@
+import 'dart:async';
+
 import 'package:flame/components.dart';
-import 'package:flame/experimental.dart';
 import 'package:flame/game.dart' as game;
 import 'package:flutter/foundation.dart';
 import 'package:sashimi/sashimi.dart';
@@ -14,9 +15,6 @@ class SashimiGame extends game.FlameGame {
 
   /// The camera component that is used to render the world.
   SashimiCamera get kamera => _engine.camera;
-
-  /// The viewfinder of the engine.
-  Viewfinder get viewfinder => _engine.viewfinder;
 
   final SashimiEngine _engine = SashimiEngine();
 
@@ -48,7 +46,7 @@ class SashimiGame extends game.FlameGame {
   }
 
   @override
-  Future<void>? add(Component component) {
+  FutureOr<void> add(Component component) {
     // If the component is a SashimiObject or SashimiSlice, add it to the engine
     if (component is SashimiObject || component is SashimiSlice) {
       return _engine.add(component);

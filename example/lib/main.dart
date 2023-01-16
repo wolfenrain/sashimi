@@ -22,7 +22,6 @@ class ExampleGame extends SashimiGame
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    debugMode = true;
 
     double value(int max) => rnd.nextInt(max) - max / 2;
 
@@ -124,22 +123,22 @@ class ExampleGame extends SashimiGame
     final rotateLeft = _keysPressed.contains(LogicalKeyboardKey.keyQ);
     final rotateRight = _keysPressed.contains(LogicalKeyboardKey.keyE);
     final rotation = rotateLeft ? 1 : (rotateRight ? -1 : 0);
-    viewfinder.angle += rotation * dt;
+    kamera.rotation += rotation * dt;
 
     final zoomIn = _keysPressed.contains(LogicalKeyboardKey.keyZ);
     final zoomOut = _keysPressed.contains(LogicalKeyboardKey.keyX);
     final zoom = zoomIn ? 1 : (zoomOut ? -1 : 0);
-    viewfinder.zoom = (viewfinder.zoom + zoom * dt).clamp(0.1, 5);
+    kamera.zoom = (kamera.zoom + zoom * dt).clamp(0.1, 5);
 
     _debugText.text = '''
 FPS: ${(firstChild<FpsComponent>()?.fps ?? 0).toStringAsFixed(2)}
 
 Objects: ${descendants().whereType<SashimiObject>().length}
-Components: ${descendants().length}
+Components: ${descendants().whereType<SashimiSlice>().length}
 
-Zoom: ${viewfinder.zoom.toStringAsFixed(2)}
-Rotation: ${(viewfinder.angle * radians2Degrees % 360).toStringAsFixed(2)} degrees
-Position: ${viewfinder.position.x.toStringAsFixed(2)}, ${viewfinder.position.y.toStringAsFixed(2)}
+Zoom: ${kamera.zoom.toStringAsFixed(2)}
+Rotation: ${(kamera.rotation * radians2Degrees % 360).toStringAsFixed(2)} degrees
+Position: ${kamera.position.x.toStringAsFixed(2)}, ${kamera.position.y.toStringAsFixed(2)}
 ''';
   }
 
@@ -184,10 +183,10 @@ Position: ${viewfinder.position.x.toStringAsFixed(2)}, ${viewfinder.position.y.t
 
       if (_previousDistance != 0) {
         if (distance < _previousDistance) {
-          viewfinder.zoom = (viewfinder.zoom * 1.05).clamp(0.1, 5);
+          kamera.zoom = (kamera.zoom * 1.05).clamp(0.1, 5);
         }
         if (distance > _previousDistance) {
-          viewfinder.zoom = (viewfinder.zoom * (1.0 / 1.05)).clamp(0.1, 5);
+          kamera.zoom = (kamera.zoom * (1.0 / 1.05)).clamp(0.1, 5);
         }
       }
       _previousDistance = distance;

@@ -17,7 +17,8 @@ import 'package:sashimi/sashimi.dart';
 /// The logical world is the world where the object exists. The visual world is
 /// the world where the object is rendered.
 /// {@endtemplate}
-abstract class SashimiObject extends Component with ParentIsA<SashimiEngine> {
+abstract class SashimiObject extends Component
+    with ParentIsA<SashimiEngine>, ChangeNotifier {
   /// {@macro sashimi_object}
   SashimiObject({
     required Vector3 position,
@@ -40,7 +41,11 @@ abstract class SashimiObject extends Component with ParentIsA<SashimiEngine> {
 
   /// The angle of rotation of the object.
   double get angle => _angle;
-  set angle(double value) => controller.angle = _angle = value;
+  set angle(double value) {
+    _angle = value;
+    notifyListeners();
+  }
+
   double _angle;
 
   /// The slices of the object.
@@ -56,57 +61,29 @@ abstract class SashimiObject extends Component with ParentIsA<SashimiEngine> {
   /// Generates the slices of the object.
   List<SashimiSlice> generateSlices();
 
-  /// Recalculates the priority of the slices.
-  void recalculate() {
-    // TODO(wolfen): correct spacing logic.
-    final betweenSlices = size.z / slices.length * scale.z;
-
-    for (var i = 0; i < slices.length; i++) {
-      slices[i].priority = (position.z + i + betweenSlices * i).toInt();
-    }
-  }
-
   @override
   @mustCallSuper
   Future<void>? onLoad() async {
     _slices.addAll(generateSlices());
     await parent.addAll([controller, ..._slices]);
-    recalculate();
+    notifyListeners();
   }
 
   @override
   void onMount() {
     super.onMount();
-    size.addListener(_onSizeUpdate);
-    scale.addListener(_onScaleUpdate);
-    position.addListener(_onPositionUpdate);
+    size.addListener(notifyListeners);
+    scale.addListener(notifyListeners);
+    position.addListener(notifyListeners);
 
-    controller.angle = angle;
-    _onSizeUpdate();
-    _onScaleUpdate();
-    _onPositionUpdate();
+    notifyListeners();
   }
 
   @override
   void onRemove() {
-    size.removeListener(_onSizeUpdate);
-    scale.removeListener(_onScaleUpdate);
-    position.removeListener(_onPositionUpdate);
+    size.removeListener(notifyListeners);
+    scale.removeListener(notifyListeners);
+    position.removeListener(notifyListeners);
     super.onRemove();
-  }
-
-  void _onSizeUpdate() {
-    controller.size.setValues(size.x, size.y);
-    recalculate();
-  }
-
-  void _onScaleUpdate() {
-    controller.scale.setValues(scale.x, scale.y);
-    recalculate();
-  }
-
-  void _onPositionUpdate() {
-    controller.position.setValues(position.x, position.y);
-    recalculate();
   }
 }

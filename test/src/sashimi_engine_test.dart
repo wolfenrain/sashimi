@@ -11,10 +11,9 @@ class _TestObject extends SashimiObject {
   _TestObject() : super(position: Vector3.zero(), size: Vector3.zero());
 
   @override
-  List<SashimiSlice<SashimiObject>> generateSlices() => [];
-
-  @override
-  void recalculate() {}
+  List<SashimiSlice<SashimiObject>> generateSlices() {
+    return [_TestSlice(owner: this)];
+  }
 }
 
 class _TestSlice extends SashimiSlice<_TestObject> {
@@ -78,6 +77,62 @@ void main() {
 
         expect(engine.visualCulling, isFalse);
         expect(engine.logicalCulling, isTrue);
+      },
+    );
+
+    sashimiGame.testGameWidget(
+      'culls slices',
+      setUp: (game, tester) => game.ensureAdd(_TestObject()),
+      verify: (game, tester) async {
+        final object = game.descendants().whereType<_TestObject>().first;
+        final slice = object.slices.first;
+
+        // Should be mounted after two ticks.
+        expect(slice.isMounted, isFalse);
+        game.update(0);
+        expect(slice.isMounted, isFalse);
+        game.update(0);
+        expect(slice.isMounted, isTrue);
+
+        // Out of view, removed in two ticks.
+        object.position.y = 800;
+        game.update(0);
+        expect(slice.isMounted, isTrue);
+        game.update(0);
+        expect(slice.isMounted, isFalse);
+
+        // Back in view, added in two ticks.
+        object.position.y = 0;
+        game.update(0);
+        expect(slice.isMounted, isFalse);
+        game.update(0);
+        expect(slice.isMounted, isTrue);
+      },
+    );
+
+    sashimiGame.testGameWidget(
+      'does not cull controllers',
+      setUp: (game, tester) => game.ensureAdd(_TestObject()),
+      verify: (game, tester) async {
+        final object = game.descendants().whereType<_TestObject>().first;
+        final controller = object.controller;
+
+        // Should be mounted directly
+        expect(controller.isMounted, isTrue);
+
+        // Stays loaded when out of view.
+        object.position.y = 800;
+        game.update(0);
+        expect(controller.isMounted, isTrue);
+        game.update(0);
+        expect(controller.isMounted, isTrue);
+
+        // Stays loaded when in view.
+        object.position.y = 0;
+        game.update(0);
+        expect(controller.isMounted, isTrue);
+        game.update(0);
+        expect(controller.isMounted, isTrue);
       },
     );
 

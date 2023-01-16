@@ -1,4 +1,3 @@
-import 'package:flame/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:sashimi/sashimi.dart';
 

@@ -1,23 +1,23 @@
 // ignore_for_file: cascade_invocations
 
-import 'package:flame/extensions.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sashimi/sashimi.dart';
 
 import '../helpers/helpers.dart';
 
 class _TestObject extends SashimiObject {
-  _TestObject() : super(position: Vector3.zero(), size: Vector3.zero());
+  _TestObject() : super(position: Vector3.zero(), size: Vector3.zero()) {
+    addListener(listener);
+  }
 
   @override
   List<SashimiSlice<SashimiObject>> generateSlices() {
     return [_TestSlice(owner: this)];
   }
 
-  @override
-  void recalculate() => calculatingCalled = true;
+  void listener() => listenerCalled = true;
 
-  bool calculatingCalled = false;
+  bool listenerCalled = false;
 }
 
 class _TestSlice extends SashimiSlice<_TestObject> {
@@ -51,64 +51,76 @@ void main() {
     );
 
     sashimiGame.testGameWidget(
-      'calls recalculate on onLoad',
+      'calls listener on onLoad',
       setUp: (game, tester) => game.ensureAdd(_TestObject()),
       verify: (game, tester) async {
         final object = game.descendants().whereType<_TestObject>().first;
 
         expect(object.isLoaded, equals(true));
-        expect(object.calculatingCalled, equals(true));
+        expect(object.listenerCalled, equals(true));
       },
     );
 
     sashimiGame.testGameWidget(
-      'calls recalculate on position change',
+      'calls listener on position change',
       setUp: (game, tester) => game.ensureAdd(_TestObject()),
       verify: (game, tester) async {
         final object = game.descendants().whereType<_TestObject>().first;
-        object.calculatingCalled = false; // Is set to true in onLoad.
+        object.listenerCalled = false; // Is set to true in onLoad.
 
         object.position.setValues(10, 10, 10);
-        expect(object.calculatingCalled, equals(true));
+        expect(object.listenerCalled, equals(true));
       },
     );
 
     sashimiGame.testGameWidget(
-      'calls recalculate on size change',
+      'calls listener on size change',
       setUp: (game, tester) => game.ensureAdd(_TestObject()),
       verify: (game, tester) async {
         final object = game.descendants().whereType<_TestObject>().first;
-        object.calculatingCalled = false; // Is set to true in onLoad.
+        object.listenerCalled = false; // Is set to true in onLoad.
 
         object.size.setValues(10, 10, 10);
-        expect(object.calculatingCalled, equals(true));
+        expect(object.listenerCalled, equals(true));
       },
     );
 
     sashimiGame.testGameWidget(
-      'calls recalculate on scale change',
+      'calls listener on scale change',
       setUp: (game, tester) => game.ensureAdd(_TestObject()),
       verify: (game, tester) async {
         final object = game.descendants().whereType<_TestObject>().first;
-        object.calculatingCalled = false; // Is set to true in onLoad.
+        object.listenerCalled = false; // Is set to true in onLoad.
 
         object.scale.setValues(10, 10, 10);
-        expect(object.calculatingCalled, equals(true));
+        expect(object.listenerCalled, equals(true));
       },
     );
 
     sashimiGame.testGameWidget(
-      'stops listening when unmounted',
+      'calls listener on angle change',
       setUp: (game, tester) => game.ensureAdd(_TestObject()),
       verify: (game, tester) async {
         final object = game.descendants().whereType<_TestObject>().first;
-        object.calculatingCalled = false; // Is set to true in onLoad.
+        object.listenerCalled = false; // Is set to true in onLoad.
+
+        object.angle = 0;
+        expect(object.listenerCalled, equals(true));
+      },
+    );
+
+    sashimiGame.testGameWidget(
+      'stops listener when unmounted',
+      setUp: (game, tester) => game.ensureAdd(_TestObject()),
+      verify: (game, tester) async {
+        final object = game.descendants().whereType<_TestObject>().first;
+        object.listenerCalled = false; // Is set to true in onLoad.
 
         object.removeFromParent();
         game.update(0); // Simulate next tick
 
         object.scale.setValues(10, 10, 10);
-        expect(object.calculatingCalled, equals(false));
+        expect(object.listenerCalled, equals(false));
       },
     );
   });

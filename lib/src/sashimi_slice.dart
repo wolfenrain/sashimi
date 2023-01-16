@@ -14,20 +14,35 @@ class SashimiSlice<Owner extends SashimiObject> extends PositionComponent
     required Owner owner,
     super.anchor = Anchor.center,
   }) : super() {
-    this.owner = owner;
+    this.owner = owner
+      ..addListener(calculatePriority)
+      ..addListener(realign);
+  }
+
+  /// Calculate the priority when the [owner] object changes.
+  void calculatePriority() {
+    final index = owner.slices.indexOf(this);
+    // NOTE(wolfen): correct spacing logic.
+    final betweenSlices = owner.size.z / owner.slices.length * owner.scale.z;
+    priority = (owner.position.z + index + betweenSlices * index).toInt();
+  }
+
+  /// Realign the component with [owner].
+  @mustCallSuper
+  void realign() {
+    size.setValues(owner.size.x, owner.size.y);
+    scale.setValues(owner.scale.x, owner.scale.y);
+    position.setValues(
+      sin(owner.parent.camera.rotation) * priority + owner.position.x,
+      -cos(owner.parent.camera.rotation) * priority + owner.position.y,
+    );
+    angle = owner.angle;
   }
 
   @override
   @mustCallSuper
   void update(double dt) {
     if (!owner.isMounted) return;
-
-    size.setValues(owner.size.x, owner.size.y);
-    scale.setValues(owner.scale.x, owner.scale.y);
-    position.setValues(
-      sin(owner.parent.viewfinder.angle) * priority + owner.position.x,
-      -cos(owner.parent.viewfinder.angle) * priority + owner.position.y,
-    );
-    angle = owner.angle;
+    realign();
   }
 }

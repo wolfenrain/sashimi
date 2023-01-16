@@ -1,7 +1,5 @@
 // ignore_for_file: cascade_invocations
 
-import 'package:flame/experimental.dart';
-import 'package:flame/extensions.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sashimi/sashimi.dart';
 
@@ -14,9 +12,6 @@ class _TestObject extends SashimiObject {
   List<SashimiSlice<SashimiObject>> generateSlices() {
     return [];
   }
-
-  @override
-  void recalculate() {}
 }
 
 void main() {
@@ -26,14 +21,6 @@ void main() {
       setUp: (game, tester) => game.ready(),
       verify: (game, tester) async {
         expect(game.kamera, isA<SashimiCamera>());
-      },
-    );
-
-    sashimiGame.testGameWidget(
-      'exposes a viewfinder',
-      setUp: (game, tester) => game.ready(),
-      verify: (game, tester) async {
-        expect(game.viewfinder, isA<Viewfinder>());
       },
     );
 

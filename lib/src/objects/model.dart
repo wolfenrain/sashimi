@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:flame/components.dart';
-import 'package:flame/extensions.dart';
 import 'package:flame/sprite.dart';
 import 'package:sashimi/sashimi.dart';
 

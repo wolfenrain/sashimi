@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flame/components.dart';
 import 'package:flame/experimental.dart';
 import 'package:flutter/foundation.dart';
@@ -21,12 +23,6 @@ class SashimiEngine extends Component {
 
   /// The camera component that is used to render the world.
   late final SashimiCamera camera = SashimiCamera(world: _world);
-
-  /// The camera's viewfinder.
-  Viewfinder get viewfinder => camera.viewfinder;
-
-  /// The camera's viewport.
-  Viewport get viewport => camera.viewport;
 
   /// The world that contains all the visual components.
   ///
@@ -68,7 +64,7 @@ class SashimiEngine extends Component {
   }
 
   @override
-  Future<void>? add(Component component) {
+  FutureOr<void> add(Component component) {
     if (component is SashimiSlice) {
       return _visualWorld.addComponent(component);
     } else if (component is SashimiController) {
@@ -83,6 +79,7 @@ class SashimiEngine extends Component {
 
   /// Converts a [point] from world coordinates to screen coordinates.
   Vector2 worldToScreen(Vector2 point) {
+    // ignore: invalid_use_of_internal_member
     return camera.viewfinder.transform.globalToLocal(
       Vector2(
         point.x -
@@ -97,6 +94,7 @@ class SashimiEngine extends Component {
 
   /// Converts a [point] from screen coordinates to world coordinates.
   Vector2 screenToWorld(Vector2 point) {
+    // ignore: invalid_use_of_internal_member
     return camera.viewfinder.transform.localToGlobal(
       Vector2(
         point.x +

@@ -1,6 +1,8 @@
 /// A sprite stacking framework build on top of Flame.
 library sashimi;
 
+export 'package:flame/extensions.dart';
+
 export 'src/components/components.dart';
 export 'src/math/math.dart';
 export 'src/objects/objects.dart';

@@ -1,4 +1,3 @@
-import 'package:flame/extensions.dart';
 import 'package:flame/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sashimi/sashimi.dart';
@@ -26,10 +25,7 @@ void main() {
             ..update(0);
         },
         goldenFile: 'golden/billboard_sprite/$angle.png',
-        game: SashimiGame()
-          // Disabling culling as it is not correctly implemented yet
-          ..visualCulling = false
-          ..kamera.viewfinder.angle = angle * degrees2Radians,
+        game: SashimiGame()..kamera.viewfinder.angle = angle * degrees2Radians,
       );
     }
   });

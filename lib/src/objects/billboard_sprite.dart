@@ -1,5 +1,4 @@
 import 'package:flame/components.dart';
-import 'package:flutter/material.dart';
 import 'package:sashimi/sashimi.dart';
 
 /// {@template billboard_sprite}
@@ -25,15 +24,10 @@ class BillboardSprite extends SashimiObject {
 
   @override
   void update(double dt) {
-    // Set the angle to the viewfinder angle and subtract own angle. This
+    // Set the angle to the world rotation and subtract own angle. This
     // ensures that if angle is set to 0, the sprite will always face the
     // camera.
-    controller.angle = parent.viewfinder.angle - angle;
-  }
-
-  @override
-  void recalculate() {
-    slices.first.priority = position.z.toInt();
+    controller.angle = parent.camera.rotation - angle;
   }
 
   @override
@@ -46,8 +40,13 @@ class _SashimiSlice extends SashimiSlice<BillboardSprite> {
   _SashimiSlice({required super.owner}) : super(anchor: Anchor.bottomCenter);
 
   @override
-  void update(double dt) {
-    super.update(dt);
+  void calculatePriority() {
+    priority = owner.position.z.toInt();
+  }
+
+  @override
+  void realign() {
+    super.realign();
 
     // Set the position relative to the position of the controller based on the
     // anchor (bottom center).

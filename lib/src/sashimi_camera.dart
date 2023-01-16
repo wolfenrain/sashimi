@@ -1,4 +1,3 @@
-import 'package:flame/effects.dart';
 import 'package:flame/experimental.dart';
 import 'package:flame/extensions.dart';
 
@@ -9,9 +8,15 @@ class SashimiCamera extends CameraComponent {
   /// {@macro sashimi_camera}
   SashimiCamera({required super.world});
 
-  /// Move the camera by the given [offset].
-  void moveBy(Vector2 offset, {double speed = double.infinity}) {
-    stop();
-    viewfinder.add(MoveByEffect(offset, EffectController(speed: speed)));
-  }
+  /// The world rotation of the camera.
+  double get rotation => viewfinder.angle;
+  set rotation(double value) => viewfinder.angle = value;
+
+  /// The zoom of the camera.
+  double get zoom => viewfinder.zoom;
+  set zoom(double value) => viewfinder.zoom = value;
+
+  /// The position of the camera.
+  Vector2 get position => viewfinder.position;
+  set position(Vector2 value) => viewfinder.position = value;
 }

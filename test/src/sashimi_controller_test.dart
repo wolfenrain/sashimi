@@ -1,4 +1,3 @@
-import 'package:flame/extensions.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sashimi/sashimi.dart';
 
@@ -9,15 +8,12 @@ class _TestObject extends SashimiObject {
 
   @override
   List<SashimiSlice<SashimiObject>> generateSlices() => [];
-
-  @override
-  void recalculate() {}
 }
 
 void main() {
   group('SashimiController', () {
     sashimiGame.testGameWidget(
-      'sync values with owner',
+      'realigns with owner',
       setUp: (game, tester) => game.ensureAdd(_TestObject()),
       verify: (game, tester) async {
         final object = game.descendants().whereType<_TestObject>().first;

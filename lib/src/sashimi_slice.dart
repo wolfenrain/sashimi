@@ -22,8 +22,7 @@ class SashimiSlice<Owner extends SashimiObject> extends PositionComponent
   /// Calculate the priority when the [owner] object changes.
   void calculatePriority() {
     final index = owner.slices.indexOf(this);
-    // NOTE(wolfen): correct spacing logic.
-    final betweenSlices = owner.size.z / owner.slices.length * owner.scale.z;
+    final betweenSlices = owner.size.z / owner.slices.length;
     priority = (owner.position.z + index + betweenSlices * index).toInt();
   }
 
@@ -32,9 +31,10 @@ class SashimiSlice<Owner extends SashimiObject> extends PositionComponent
   void realign() {
     size.setValues(owner.size.x, owner.size.y);
     scale.setValues(owner.scale.x, owner.scale.y);
+    final scaledPriority = priority * owner.scale.z;
     position.setValues(
-      sin(owner.parent.camera.rotation) * priority + owner.position.x,
-      -cos(owner.parent.camera.rotation) * priority + owner.position.y,
+      sin(owner.parent.camera.rotation) * scaledPriority + owner.position.x,
+      -cos(owner.parent.camera.rotation) * scaledPriority + owner.position.y,
     );
     angle = owner.angle;
   }

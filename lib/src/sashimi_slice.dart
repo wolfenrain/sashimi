@@ -22,7 +22,6 @@ class SashimiSlice<Owner extends SashimiObject> extends PositionComponent
   /// Calculate the priority when the [owner] object changes.
   void calculatePriority() {
     final index = owner.slices.indexOf(this);
-    // NOTE(wolfen): correct spacing logic.
     final betweenSlices = owner.size.z / owner.slices.length;
     priority = (owner.position.z + index + betweenSlices * index).toInt();
   }

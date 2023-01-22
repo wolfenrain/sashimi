@@ -1,3 +1,7 @@
+# 0.1.0-dev.4
+
+- fix: take z-scale into factor when positioning ([#12](https://github.com/wolfenrain/sashimi/pull/12))
+
 # 0.1.0-dev.3
 
 - fix!: update flame dependency to v1.6.0 ([#8](https://github.com/wolfenrain/sashimi/pull/8))

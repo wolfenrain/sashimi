@@ -137,31 +137,32 @@ void main() {
     );
 
     sashimiGame.testGameWidget(
-      'add only allows Sashimi-based components',
+      'none Sashimi-based objects get added to the world directly',
       setUp: (game, tester) => game.ready(),
       verify: (game, tester) async {
         final engine = game.engine;
+        final world = engine.firstChild<World>()!;
 
         final object = _TestObject();
         final controller = SashimiController(owner: object);
         final slice = _TestSlice(owner: object);
+        final component = Component();
 
-        expect(engine.add(object), completes);
-        expect(engine.add(controller), completes);
-        expect(engine.add(slice), completes);
+        await engine.add(object);
+        game.update(0);
+        expect(world.children.contains(object), isFalse);
 
-        expect(
-          () => engine.add(Component()),
-          throwsA(
-            isA<UnimplementedError>().having(
-              (e) => e.message,
-              'message',
-              equals(
-                'Only Sashimi-based components can be added to the engine.',
-              ),
-            ),
-          ),
-        );
+        await engine.add(controller);
+        game.update(0);
+        expect(world.children.contains(controller), isFalse);
+
+        await engine.add(slice);
+        game.update(0);
+        expect(world.children.contains(slice), isFalse);
+
+        await engine.add(component);
+        game.update(0);
+        expect(world.children.contains(component), isTrue);
       },
     );
 

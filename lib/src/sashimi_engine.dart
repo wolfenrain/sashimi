@@ -72,9 +72,7 @@ class SashimiEngine extends Component {
     } else if (component is SashimiObject) {
       return super.add(component);
     }
-    throw UnimplementedError(
-      'Only Sashimi-based components can be added to the engine.',
-    );
+    return _world.add(component);
   }
 
   /// Converts a [point] from world coordinates to screen coordinates.

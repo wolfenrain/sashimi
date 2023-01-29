@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flame/components.dart';
-import 'package:flame/experimental.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sashimi/sashimi.dart';
 
@@ -19,10 +18,11 @@ import 'package:sashimi/sashimi.dart';
 /// [SashimiSlice]s. The [SashimiObject]s are directly added to the engine.
 /// {@endtemplate}
 class SashimiEngine extends Component {
-  final World _world = World();
+  /// {@macro sashimi_engine}
+  SashimiEngine({SashimiCamera? camera}) : camera = camera ?? SashimiCamera();
 
   /// The camera component that is used to render the world.
-  late final SashimiCamera camera = SashimiCamera(world: _world);
+  final SashimiCamera camera;
 
   /// The world that contains all the visual components.
   ///
@@ -58,8 +58,8 @@ class SashimiEngine extends Component {
   @override
   @mustCallSuper
   Future<void> onLoad() async {
-    await _world.addAll([_visualWorld, _logicalWorld]);
-    await super.add(_world); // Use super.add to skip engine rules.
+    await camera.world.addAll([_visualWorld, _logicalWorld]);
+    await super.add(camera.world); // Use super.add to skip engine rules.
     await super.add(camera); // Use super.add to skip engine rules.
   }
 
@@ -72,7 +72,7 @@ class SashimiEngine extends Component {
     } else if (component is SashimiObject) {
       return super.add(component);
     }
-    return _world.add(component);
+    return camera.world.add(component);
   }
 
   /// Converts a [point] from world coordinates to screen coordinates.

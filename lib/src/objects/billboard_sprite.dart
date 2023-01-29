@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flame/components.dart';
 import 'package:sashimi/sashimi.dart';
 
@@ -50,7 +52,7 @@ class _SashimiSlice extends SashimiSlice<BillboardSprite> {
 
     // Set the position relative to the position of the controller based on the
     // anchor (bottom center).
-    position.setFrom(owner.controller.positionOfAnchor(anchor));
+    // position.setFrom(owner.controller.positionOfAnchor(anchor));
 
     // Set the angle to the controller's angle as that one will always be
     // visually correct.
@@ -58,7 +60,19 @@ class _SashimiSlice extends SashimiSlice<BillboardSprite> {
   }
 
   @override
+  void renderTree(Canvas canvas) {
+    angle = owner.controller.angle;
+    super.renderTree(canvas);
+  }
+
+  @override
   void render(Canvas canvas) {
-    owner.sprite.render(canvas, size: owner.size.xy);
+    canvas.scale(1, 1 / cos(owner.parent.camera.tilt));
+
+    canvas.translate(
+      0,
+      -size.y + size.y * cos(owner.parent.camera.tilt),
+    );
+    owner.sprite.render(canvas, size: size);
   }
 }

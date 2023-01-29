@@ -89,18 +89,16 @@ class ExampleGame extends SashimiGame
       ),
     );
 
-    await add(
-      BillboardSprite(
-        position: Vector3(0, 0, 140),
-        size: Vector2.all(64),
-        scale: Vector2.all(2),
-        sprite: await Sprite.load('house.png', images: images),
-      ),
-    );
+    // await add(
+    //   BillboardSprite(
+    //     position: Vector3(0, 0, 140),
+    //     size: Vector2.all(64),
+    //     scale: Vector2.all(2),
+    //     sprite: await Sprite.load('house.png', images: images),
+    //   ),
+    // );
 
-    kamera
-      ..follow(PositionComponent())
-      ..viewfinder.zoom = 1;
+    kamera..viewfinder.zoom = 0.5;
 
     // Create a single sliced colored cube to act as water.
     await add(
@@ -111,6 +109,8 @@ class ExampleGame extends SashimiGame
       ),
     );
 
+    debugLogical = true;
+
     if (kDebugMode) {
       await addAll([FpsComponent(), _debugText]);
     }
@@ -120,10 +120,13 @@ class ExampleGame extends SashimiGame
   void update(double dt) {
     super.update(dt);
 
+    final tiltForward = _keysPressed.contains(LogicalKeyboardKey.keyR);
+    final tiltBackward = _keysPressed.contains(LogicalKeyboardKey.keyF);
+    kamera.tilt += tiltForward ? 1 : (tiltBackward ? -1 : 0) * dt;
+
     final rotateLeft = _keysPressed.contains(LogicalKeyboardKey.keyQ);
     final rotateRight = _keysPressed.contains(LogicalKeyboardKey.keyE);
-    final rotation = rotateLeft ? 1 : (rotateRight ? -1 : 0);
-    kamera.rotation += rotation * dt;
+    kamera.rotation += rotateLeft ? 1 : (rotateRight ? -1 : 0) * dt;
 
     final zoomIn = _keysPressed.contains(LogicalKeyboardKey.keyZ);
     final zoomOut = _keysPressed.contains(LogicalKeyboardKey.keyX);
@@ -138,6 +141,7 @@ Components: ${descendants().whereType<SashimiSlice>().length}
 
 Zoom: ${kamera.zoom.toStringAsFixed(2)}
 Rotation: ${(kamera.rotation * radians2Degrees % 360).toStringAsFixed(2)} degrees
+Tilt: ${(kamera.tilt * radians2Degrees % 360).toStringAsFixed(2)} degrees
 Position: ${kamera.position.x.toStringAsFixed(2)}, ${kamera.position.y.toStringAsFixed(2)}
 ''';
   }
@@ -154,21 +158,25 @@ Position: ${kamera.position.x.toStringAsFixed(2)}, ${kamera.position.y.toStringA
   }
 
   final Map<int, Vector2> _dragPositions = {};
+  Vector2? _dragStartPosition;
   double _previousDistance = 0;
 
   @override
   void onDragStart(int pointerId, DragStartInfo info) {
     _dragPositions[pointerId] = info.eventPosition.game;
+    _dragStartPosition = info.eventPosition.global;
   }
 
   @override
   void onDragEnd(int pointerId, DragEndInfo info) {
     _dragPositions.remove(pointerId);
+    _dragStartPosition = null;
   }
 
   @override
   void onDragCancel(int pointerId) {
     _dragPositions.remove(pointerId);
+    _dragStartPosition = null;
   }
 
   @override
@@ -183,19 +191,29 @@ Position: ${kamera.position.x.toStringAsFixed(2)}, ${kamera.position.y.toStringA
 
       if (_previousDistance != 0) {
         if (distance < _previousDistance) {
-          kamera.zoom = (kamera.zoom * 1.05).clamp(0.1, 5);
+          kamera.zoom = (kamera.zoom * 1.01).clamp(0.1, 5);
         }
         if (distance > _previousDistance) {
-          kamera.zoom = (kamera.zoom * (1.0 / 1.05)).clamp(0.1, 5);
+          kamera.zoom = (kamera.zoom * (1.0 / 1.01)).clamp(0.1, 5);
         }
       }
       _previousDistance = distance;
     } else {
-      kamera.moveBy(
-        Vector2.copy(-info.delta.game)
-          ..rotate(kamera.viewfinder.angle)
-          ..scale(1.0 / kamera.viewfinder.zoom),
-      );
+      // If only pointer is on the screen, move the camera within the center
+      // of the screen. Otherwise, rotate and tilt the camera.
+      final centerRect = size * 0.25 & size * 0.5;
+      if (centerRect.containsPoint(_dragStartPosition!)) {
+        kamera.moveBy(
+          Vector2.copy(-info.delta.game)
+            ..rotate(kamera.viewfinder.angle)
+            ..scale(1.0 / kamera.viewfinder.zoom),
+        );
+      } else {
+        final delta = info.delta.game;
+        kamera
+          ..tilt += delta.y * 0.01
+          ..rotation += delta.x * 0.01;
+      }
     }
   }
 }

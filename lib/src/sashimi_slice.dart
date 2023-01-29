@@ -33,8 +33,14 @@ class SashimiSlice<Owner extends SashimiObject> extends PositionComponent
     scale.setValues(owner.scale.x, owner.scale.y);
     final scaledPriority = priority * owner.scale.z;
     position.setValues(
-      sin(owner.parent.camera.rotation) * scaledPriority + owner.position.x,
-      -cos(owner.parent.camera.rotation) * scaledPriority + owner.position.y,
+      sin(owner.parent.camera.rotation) /
+              cos(owner.parent.camera.tilt) *
+              scaledPriority +
+          owner.position.x,
+      -cos(owner.parent.camera.rotation) /
+              cos(owner.parent.camera.tilt) *
+              scaledPriority +
+          owner.position.y,
     );
     angle = owner.angle;
   }

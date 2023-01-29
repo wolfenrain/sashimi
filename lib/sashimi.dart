@@ -14,3 +14,4 @@ export 'src/sashimi_game.dart';
 export 'src/sashimi_object.dart';
 export 'src/sashimi_owner.dart';
 export 'src/sashimi_slice.dart';
+export 'src/sashimi_world.dart';

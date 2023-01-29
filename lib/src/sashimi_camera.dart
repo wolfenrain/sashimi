@@ -1,16 +1,30 @@
+import 'dart:math';
+
 import 'package:flame/experimental.dart';
-import 'package:flame/extensions.dart';
+import 'package:sashimi/sashimi.dart';
 
 /// {@template sashimi_camera}
 /// The camera used by the Sashimi Engine.
 /// {@endtemplate}
 class SashimiCamera extends CameraComponent {
   /// {@macro sashimi_camera}
-  SashimiCamera({required super.world});
+  SashimiCamera({
+    double initialTilt = 45 * degrees2Radians,
+    this.minimalTilt = 22.5 * degrees2Radians,
+    this.maximalTilt = 67.5 * degrees2Radians,
+  })  : _tilt = initialTilt.clamp(minimalTilt, maximalTilt),
+        super(world: SashimiWorld());
 
   /// The world rotation of the camera.
   double get rotation => viewfinder.angle;
   set rotation(double value) => viewfinder.angle = value;
+
+  double minimalTilt;
+  double maximalTilt;
+
+  double get tilt => _tilt;
+  double _tilt;
+  set tilt(double value) => _tilt = value.clamp(minimalTilt, maximalTilt);
 
   /// The zoom of the camera.
   double get zoom => viewfinder.zoom;
@@ -19,4 +33,17 @@ class SashimiCamera extends CameraComponent {
   /// The position of the camera.
   Vector2 get position => viewfinder.position;
   set position(Vector2 value) => viewfinder.position = value;
+
+  @override
+  Rect get visibleWorldRect {
+    // TODO(wolfen): optimize by caching
+    final visibleWorldRect = super.visibleWorldRect;
+    final value = 1 / cos(tilt);
+    return Rect.fromLTRB(
+      visibleWorldRect.left * value,
+      visibleWorldRect.top * value,
+      visibleWorldRect.right * value,
+      visibleWorldRect.bottom * value,
+    );
+  }
 }

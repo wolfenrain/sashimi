@@ -8,8 +8,8 @@ import 'package:sashimi/sashimi.dart';
 /// A component that culls its children based on whether they are inside the
 /// screen or not.
 /// {@endtemplate}
-class CullComponent<T extends SashimiOwner> extends Component
-    with HasGameRef<SashimiGame>, HasAncestor<SashimiEngine> {
+class CullComponent<T extends PositionComponent> extends Component
+    with HasAncestor<SashimiEngine> {
   /// {@macro cull_component}
   CullComponent({
     bool cullingEnabled = false,

@@ -10,8 +10,9 @@ class ColoredCuboid extends SashimiObject {
     required super.position,
     required super.size,
     super.scale,
-    super.angle,
+    super.rotation,
     required this.colors,
+    super.controller,
   });
 
   /// The colors to use.
@@ -21,20 +22,10 @@ class ColoredCuboid extends SashimiObject {
   final List<Color> colors;
 
   @override
-  void update(double dt) {
-    // Update the position of the controller to match the bottom slice of the
-    // model (the first slice in the list).
-    controller.position.setFrom(slices.first.position);
-  }
-
-  @override
   List<SashimiSlice> generateSlices() {
     return [
-      for (var i = 0; i < colors.length; i++)
-        _SashimiSlice(
-          owner: this,
-          color: colors[i],
-        ),
+      for (var i = 0.0; i < colors.length; i += 1 / engine.fidelity)
+        _SashimiSlice(owner: this, color: colors[i.floor()]),
     ];
   }
 }

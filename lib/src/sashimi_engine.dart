@@ -19,7 +19,11 @@ import 'package:sashimi/sashimi.dart';
 /// {@endtemplate}
 class SashimiEngine extends Component {
   /// {@macro sashimi_engine}
-  SashimiEngine({SashimiCamera? camera}) : camera = camera ?? SashimiCamera();
+  SashimiEngine({
+    SashimiCamera? camera,
+    int fidelity = 1,
+  })  : camera = camera ?? SashimiCamera(),
+        _fidelity = fidelity;
 
   /// The camera component that is used to render the world.
   final SashimiCamera camera;
@@ -37,15 +41,11 @@ class SashimiEngine extends Component {
   /// collision detection. This world tends to have a smaller component list
   /// than the [_visualWorld] as it only has [SashimiController]s, which there
   /// is only one of per [SashimiObject].
-  final _logicalWorld = CullComponent<SashimiController>();
+  final _logicalWorld = Component();
 
   /// Whether the visual world should cull components.
   bool get visualCulling => _visualWorld.cullingEnabled;
   set visualCulling(bool value) => _visualWorld.cullingEnabled = value;
-
-  /// Whether the logical world should cull components.
-  bool get logicalCulling => _logicalWorld.cullingEnabled;
-  set logicalCulling(bool value) => _logicalWorld.cullingEnabled = value;
 
   /// Debug mode for the visual world.
   bool get debugVisual => _visualWorld.debugMode;
@@ -55,12 +55,31 @@ class SashimiEngine extends Component {
   bool get debugLogical => _logicalWorld.debugMode;
   set debugLogical(bool value) => _logicalWorld.debugMode = value;
 
+  /// The fidelity of the engine, which is used to calculate the number of
+  /// slices per object that need to be rendered.
+  int get fidelity => _fidelity;
+  int _fidelity;
+  set fidelity(int value) {
+    assert(fidelity >= 1 && fidelity <= 8, 'Fidelity must be between 1 and 8');
+    _fidelity = value;
+
+    for (final object in _objects) {
+      object.regenerate();
+    }
+    _visualWorld.reorderChildren();
+  }
+
+  late final List<SashimiObject> _objects;
+
   @override
   @mustCallSuper
   Future<void> onLoad() async {
     await camera.world.addAll([_visualWorld, _logicalWorld]);
     await super.add(camera.world); // Use super.add to skip engine rules.
     await super.add(camera); // Use super.add to skip engine rules.
+
+    children.register<SashimiObject>();
+    _objects = children.query<SashimiObject>();
   }
 
   @override
@@ -68,7 +87,7 @@ class SashimiEngine extends Component {
     if (component is SashimiSlice) {
       return _visualWorld.addComponent(component);
     } else if (component is SashimiController) {
-      return _logicalWorld.addComponent(component);
+      return _logicalWorld.add(component);
     } else if (component is SashimiObject) {
       return super.add(component);
     }

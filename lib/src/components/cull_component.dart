@@ -46,6 +46,11 @@ class CullComponent<T extends PositionComponent> extends Component
     return super.onLoad();
   }
 
+  // void clear() {
+  //   _inactive.clear();
+  //   _active.clear();
+  // }
+
   /// Adds a component to the component.
   ///
   /// If culling is disabled, it will be immediately added otherwise it will be

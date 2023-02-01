@@ -9,9 +9,9 @@ import 'package:sashimi/sashimi.dart';
 class SashimiCamera extends CameraComponent {
   /// {@macro sashimi_camera}
   SashimiCamera({
-    double initialTilt = 45 * degrees2Radians,
-    this.minimalTilt = 22.5 * degrees2Radians,
-    this.maximalTilt = 67.5 * degrees2Radians,
+    double initialTilt = 60 * degrees2Radians,
+    this.minimalTilt = 1 * degrees2Radians,
+    this.maximalTilt = 89 * degrees2Radians,
   })  : _tilt = initialTilt.clamp(minimalTilt, maximalTilt),
         super(world: SashimiWorld());
 
@@ -28,7 +28,8 @@ class SashimiCamera extends CameraComponent {
 
   /// The zoom of the camera.
   double get zoom => viewfinder.zoom;
-  set zoom(double value) => viewfinder.zoom = value;
+  set zoom(double value) =>
+      viewfinder.zoom = value.clamp(0.01, double.infinity);
 
   /// The position of the camera.
   Vector2 get position => viewfinder.position;

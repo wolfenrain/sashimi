@@ -16,6 +16,8 @@ class _TestObject extends SashimiObject {
   }
 }
 
+class _TestController extends Component with SashimiController {}
+
 class _TestSlice extends SashimiSlice<_TestObject> {
   _TestSlice({
     required super.owner,
@@ -42,7 +44,7 @@ void main() {
         final engine = game.engine;
         final world = engine.firstChild<World>()!;
 
-        expect(world.children.whereType<CullComponent>().length, equals(2));
+        expect(world.children.whereType<CullComponent>().length, equals(1));
       },
     );
 
@@ -70,13 +72,10 @@ void main() {
         final engine = game.engine;
 
         expect(engine.visualCulling, isTrue);
-        expect(engine.logicalCulling, isFalse);
 
         engine.visualCulling = false;
-        engine.logicalCulling = true;
 
         expect(engine.visualCulling, isFalse);
-        expect(engine.logicalCulling, isTrue);
       },
     );
 
@@ -144,7 +143,7 @@ void main() {
         final world = engine.firstChild<World>()!;
 
         final object = _TestObject();
-        final controller = SashimiController(owner: object);
+        final controller = _TestController();
         final slice = _TestSlice(owner: object);
         final component = Component();
 

@@ -13,28 +13,37 @@ class BillboardSprite extends SashimiObject {
     required this.sprite,
     required Vector2 size,
     Vector2? scale,
-    super.angle,
+    super.rotation,
+    SashimiController? controller,
   }) : super(
           size: Vector3(size.x, size.y, 1),
           scale: Vector3(scale?.x ?? 1, scale?.y ?? 1, 1),
-        ) {
-    controller.anchor = Anchor.bottomCenter;
-  }
+          controller: controller ?? BillboardController(),
+        );
 
   /// The sprite to render.
   final Sprite sprite;
 
   @override
-  void update(double dt) {
-    // Set the angle to the world rotation and subtract own angle. This
-    // ensures that if angle is set to 0, the sprite will always face the
-    // camera.
-    controller.angle = parent.camera.rotation - angle;
-  }
-
-  @override
   List<SashimiSlice<SashimiObject>> generateSlices() {
     return [_SashimiSlice(owner: this)];
+  }
+}
+
+/// {@template billboard_controller}
+/// The [SashimiController] for the [BillboardSprite].
+///
+/// It forces the rotation to always be equal to the camera rotation to ensure
+/// it is always facing the player.
+/// {@endtemplate}
+class BillboardController extends PositionedController {
+  /// {@macro billboard_controller}
+  BillboardController({super.anchor = Anchor.bottomCenter});
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+    rotation = engine.camera.rotation;
   }
 }
 
@@ -47,32 +56,14 @@ class _SashimiSlice extends SashimiSlice<BillboardSprite> {
   }
 
   @override
-  void realign() {
-    super.realign();
-
-    // Set the position relative to the position of the controller based on the
-    // anchor (bottom center).
-    // position.setFrom(owner.controller.positionOfAnchor(anchor));
-
-    // Set the angle to the controller's angle as that one will always be
-    // visually correct.
-    angle = owner.controller.angle;
-  }
-
-  @override
-  void renderTree(Canvas canvas) {
-    angle = owner.controller.angle;
-    super.renderTree(canvas);
-  }
-
-  @override
   void render(Canvas canvas) {
-    canvas.scale(1, 1 / cos(owner.parent.camera.tilt));
+    // Scale the canvas in the opposite direction (the world tilt) to allow the
+    // sprite to render in normal 2D space. Also translating it on the y-axis
+    // to place the sprite back on the original location.
+    canvas
+      ..scale(1, 1 / cos(owner.parent.camera.tilt))
+      ..translate(0, -size.y + size.y * cos(owner.parent.camera.tilt));
 
-    canvas.translate(
-      0,
-      -size.y + size.y * cos(owner.parent.camera.tilt),
-    );
     owner.sprite.render(canvas, size: size);
   }
 }

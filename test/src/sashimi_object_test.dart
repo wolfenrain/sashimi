@@ -6,18 +6,12 @@ import 'package:sashimi/sashimi.dart';
 import '../helpers/helpers.dart';
 
 class _TestObject extends SashimiObject {
-  _TestObject() : super(position: Vector3.zero(), size: Vector3.zero()) {
-    addListener(listener);
-  }
+  _TestObject() : super(position: Vector3.zero(), size: Vector3.zero());
 
   @override
   List<SashimiSlice<SashimiObject>> generateSlices() {
     return [_TestSlice(owner: this)];
   }
-
-  void listener() => listenerCalled = true;
-
-  bool listenerCalled = false;
 }
 
 class _TestSlice extends SashimiSlice<_TestObject> {
@@ -29,14 +23,14 @@ class _TestSlice extends SashimiSlice<_TestObject> {
 void main() {
   group('SashimiObject', () {
     sashimiGame.testGameWidget(
-      'sets angle to object and controller',
+      'sets rotation to object and controller',
       setUp: (game, tester) => game.ensureAdd(_TestObject()),
       verify: (game, tester) async {
         final object = game.descendants().whereType<_TestObject>().first;
-        object.angle = 10;
+        object.rotation = 10;
 
-        expect(object.angle, equals(10));
-        expect(object.controller.angle, equals(10));
+        expect(object.rotation, equals(10));
+        expect(object.controller.rotation, equals(10));
       },
     );
 
@@ -57,7 +51,6 @@ void main() {
         final object = game.descendants().whereType<_TestObject>().first;
 
         expect(object.isLoaded, equals(true));
-        expect(object.listenerCalled, equals(true));
       },
     );
 
@@ -66,10 +59,12 @@ void main() {
       setUp: (game, tester) => game.ensureAdd(_TestObject()),
       verify: (game, tester) async {
         final object = game.descendants().whereType<_TestObject>().first;
-        object.listenerCalled = false; // Is set to true in onLoad.
 
+        var listenerCalled = false;
+        object.position.addListener(() => listenerCalled = true);
         object.position.setValues(10, 10, 10);
-        expect(object.listenerCalled, equals(true));
+
+        expect(listenerCalled, equals(true));
       },
     );
 
@@ -78,10 +73,12 @@ void main() {
       setUp: (game, tester) => game.ensureAdd(_TestObject()),
       verify: (game, tester) async {
         final object = game.descendants().whereType<_TestObject>().first;
-        object.listenerCalled = false; // Is set to true in onLoad.
 
+        var listenerCalled = false;
+        object.size.addListener(() => listenerCalled = true);
         object.size.setValues(10, 10, 10);
-        expect(object.listenerCalled, equals(true));
+
+        expect(listenerCalled, equals(true));
       },
     );
 
@@ -90,37 +87,12 @@ void main() {
       setUp: (game, tester) => game.ensureAdd(_TestObject()),
       verify: (game, tester) async {
         final object = game.descendants().whereType<_TestObject>().first;
-        object.listenerCalled = false; // Is set to true in onLoad.
 
+        var listenerCalled = false;
+        object.scale.addListener(() => listenerCalled = true);
         object.scale.setValues(10, 10, 10);
-        expect(object.listenerCalled, equals(true));
-      },
-    );
 
-    sashimiGame.testGameWidget(
-      'calls listener on angle change',
-      setUp: (game, tester) => game.ensureAdd(_TestObject()),
-      verify: (game, tester) async {
-        final object = game.descendants().whereType<_TestObject>().first;
-        object.listenerCalled = false; // Is set to true in onLoad.
-
-        object.angle = 0;
-        expect(object.listenerCalled, equals(true));
-      },
-    );
-
-    sashimiGame.testGameWidget(
-      'stops listener when unmounted',
-      setUp: (game, tester) => game.ensureAdd(_TestObject()),
-      verify: (game, tester) async {
-        final object = game.descendants().whereType<_TestObject>().first;
-        object.listenerCalled = false; // Is set to true in onLoad.
-
-        object.removeFromParent();
-        game.update(0); // Simulate next tick
-
-        object.scale.setValues(10, 10, 10);
-        expect(object.listenerCalled, equals(false));
+        expect(listenerCalled, equals(true));
       },
     );
   });

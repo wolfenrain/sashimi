@@ -52,13 +52,10 @@ void main() {
       setUp: (game, tester) => game.ready(),
       verify: (game, tester) async {
         expect(game.visualCulling, isTrue);
-        expect(game.logicalCulling, isFalse);
 
         game.visualCulling = false;
-        game.logicalCulling = true;
 
         expect(game.visualCulling, isFalse);
-        expect(game.logicalCulling, isTrue);
       },
     );
 

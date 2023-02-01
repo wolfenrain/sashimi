@@ -11,8 +11,9 @@ class ColoredCylinder extends SashimiObject {
     required double height,
     required double diameter,
     super.scale,
-    super.angle,
+    super.rotation,
     required this.colors,
+    super.controller,
   }) : super(size: Vector3(diameter, diameter, height));
 
   /// The colors to use.
@@ -22,20 +23,10 @@ class ColoredCylinder extends SashimiObject {
   final List<Color> colors;
 
   @override
-  void update(double dt) {
-    // Update the position of the controller to match the bottom slice of the
-    // model (the first slice in the list).
-    controller.position.setFrom(slices.first.position);
-  }
-
-  @override
   List<SashimiSlice> generateSlices() {
     return [
-      for (var i = 0; i < colors.length; i++)
-        _SashimiSlice(
-          owner: this,
-          color: colors[i],
-        ),
+      for (var i = 0.0; i < colors.length; i += 1 / engine.fidelity)
+        _SashimiSlice(owner: this, color: colors[i.floor()]),
     ];
   }
 }
@@ -50,8 +41,10 @@ class _SashimiSlice extends SashimiSlice<ColoredCylinder> {
 
   final Paint paint;
 
+  static const _fullCircle = 360 * degrees2Radians;
+
   @override
   void render(Canvas canvas) {
-    canvas.drawArc(Vector2.zero() & size, 0, 6.283185307179586, true, paint);
+    canvas.drawArc(Vector2.zero() & size, 0, _fullCircle, true, paint);
   }
 }

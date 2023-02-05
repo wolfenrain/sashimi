@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flame/experimental.dart';
 import 'package:sashimi/sashimi.dart';
 
@@ -18,14 +16,6 @@ class SashimiWorld extends World {
       'SashimiWorld requires a SashimiCamera to be set as the current camera.',
     );
     final camera = CameraComponent.currentCamera! as SashimiCamera;
-
-    return super.renderFromCamera(
-      canvas
-        ..translate(camera.position.x, camera.position.y)
-        ..rotate(camera.rotation)
-        ..scale(1, cos(camera.tilt))
-        ..rotate(-camera.rotation)
-        ..translate(-camera.position.x, -camera.position.y),
-    );
+    return super.renderFromCamera(canvas..transform(camera.projection.storage));
   }
 }

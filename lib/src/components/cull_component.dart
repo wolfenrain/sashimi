@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flame/components.dart';
-import 'package:flame/experimental.dart';
 import 'package:sashimi/sashimi.dart';
 
 /// {@template cull_component}
@@ -22,7 +21,7 @@ class CullComponent<T extends PositionComponent> extends Component
   late final List<T> _active;
 
   /// The camera of the engine.
-  CameraComponent get camera => ancestor.camera;
+  SashimiCamera get camera => ancestor.camera;
 
   /// If culling is enabled for this component.
   bool get cullingEnabled => _cullingEnabled;
@@ -45,11 +44,6 @@ class CullComponent<T extends PositionComponent> extends Component
     _active = children.query<T>();
     return super.onLoad();
   }
-
-  // void clear() {
-  //   _inactive.clear();
-  //   _active.clear();
-  // }
 
   /// Adds a component to the component.
   ///
@@ -88,4 +82,11 @@ class CullComponent<T extends PositionComponent> extends Component
     // Reorder all children to ensure their priorities are correct after adding.
     reorderChildren();
   }
+
+  // @override
+  // void renderTree(Canvas canvas) {
+  //   // TODO: implement renderTree
+  //   super.renderTree(canvas);
+  //   canvas.drawRect(camera.visibleWorldRect, Paint());
+  // }
 }

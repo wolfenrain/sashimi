@@ -30,7 +30,9 @@ abstract class SashimiObject extends Component with ParentIsA<SashimiEngine> {
           ..position3D.setFrom(position)
           ..size3D.setFrom(size)
           ..scale3D.setFrom(scale ?? Vector3.all(1))
-          ..rotation = rotation;
+          ..rotation = rotation {
+    _controller.object = this;
+  }
 
   /// The position of the object in the world.
   NotifyingVector3 get position => _controller.position3D;
@@ -53,7 +55,6 @@ abstract class SashimiObject extends Component with ParentIsA<SashimiEngine> {
   ///
   /// This is used to control the position, size, scale and angle of the object
   /// in the logical world.
-  @internal
   SashimiController get controller => _controller;
   final SashimiController _controller;
 
@@ -81,7 +82,7 @@ abstract class SashimiObject extends Component with ParentIsA<SashimiEngine> {
 
   @override
   @mustCallSuper
-  Future<void>? onLoad() async {
+  Future<void> onLoad() async {
     await regenerate();
     await parent.add(_controller);
   }

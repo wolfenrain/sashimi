@@ -26,65 +26,67 @@ class ExampleGame extends SashimiGame
     return Vector3(value(middle) + min, value(middle) + max, 0);
   }
 
-  late Model model;
+  late Cube cube;
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
 
-    // for (final position in [
-    //   for (var i = 0; i < 10; i++) ...[
-    //     randomPos(5000, -2500, -2500),
-    //     randomPos(5000, 2500, 2500),
-    //     randomPos(5000, -2500, 2500),
-    //     randomPos(5000, 2500, -2500),
-    //   ],
-    // ]) {
-    //   final scale = rnd.nextDouble() + 0.5;
+    // debugLogical = true;
 
-    //   final model = Model(
-    //     position: position,
-    //     size: Vector3(593, 559, 140),
-    //     scale: Vector3(scale, scale, 1),
-    //     rotation: rnd.nextInt(180) * degrees2Radians,
-    //     image: await images.load('island.png'),
-    //   );
+    for (final position in [
+      for (var i = 0; i < 10; i++) ...[
+        randomPos(5000, -2500, -2500),
+        randomPos(5000, 2500, 2500),
+        randomPos(5000, -2500, 2500),
+        randomPos(5000, 2500, -2500),
+      ],
+    ]) {
+      final scale = rnd.nextDouble() + 0.5;
 
-    //   await add(model);
+      final model = Model(
+        position: position,
+        size: Vector3(593, 559, 140),
+        scale: Vector3(scale, scale, 1),
+        rotation: rnd.nextInt(180) * degrees2Radians,
+        image: await images.load('island.png'),
+      );
 
-    //   const amountOfSlicesPerColor = 3;
-    //   final colors = [
-    //     for (var i = 0; i < amountOfSlicesPerColor; i++) Colors.red,
-    //     for (var i = 0; i < amountOfSlicesPerColor; i++) Colors.green,
-    //     for (var i = 0; i < amountOfSlicesPerColor; i++) Colors.blue,
-    //   ];
+      await add(model);
 
-    //   final SashimiObject object;
-    //   switch (rnd.nextInt(2)) {
-    //     case 0:
-    //       object = ColoredCuboid(
-    //         position: Vector3(position.x, position.y, 140),
-    //         size: Vector3.all(100),
-    //         scale: Vector3.all(1),
-    //         rotation: rnd.nextInt(180) * degrees2Radians,
-    //         colors: colors,
-    //       );
-    //       break;
-    //     case 1:
-    //       object = ColoredCylinder(
-    //         position: Vector3(position.x, position.y, 140),
-    //         height: 100,
-    //         diameter: 100,
-    //         scale: Vector3.all(1),
-    //         rotation: rnd.nextInt(180) * degrees2Radians,
-    //         colors: colors,
-    //       );
-    //       break;
-    //     default:
-    //       throw RangeError('Unknown value');
-    //   }
-    //   await add(object);
-    // }
+      const amountOfSlicesPerColor = 3;
+      final colors = [
+        for (var i = 0; i < amountOfSlicesPerColor; i++) Colors.red,
+        for (var i = 0; i < amountOfSlicesPerColor; i++) Colors.green,
+        for (var i = 0; i < amountOfSlicesPerColor; i++) Colors.blue,
+      ];
+
+      final SashimiObject object;
+      switch (rnd.nextInt(2)) {
+        case 0:
+          object = ColoredCuboid(
+            position: Vector3(position.x, position.y, 140),
+            size: Vector3.all(100),
+            scale: Vector3.all(1),
+            rotation: rnd.nextInt(180) * degrees2Radians,
+            colors: colors,
+          );
+          break;
+        case 1:
+          object = ColoredCylinder(
+            position: Vector3(position.x, position.y, 140),
+            height: 100,
+            diameter: 100,
+            scale: Vector3.all(1),
+            rotation: rnd.nextInt(180) * degrees2Radians,
+            colors: colors,
+          );
+          break;
+        default:
+          throw RangeError('Unknown value');
+      }
+      await add(object);
+    }
 
     await add(
       Model(
@@ -129,12 +131,14 @@ class ExampleGame extends SashimiGame
         scale: Vector3.all(4),
         image: await images.load('test.png'),
       ),
-      Cube(
+      cube = Cube(
         position: Vector3(140, 200, 140),
         scale: Vector3.all(6),
         image: await images.load('test.png'),
       ),
     ]);
+
+    debugLogical = true;
 
     if (kDebugMode) {
       await addAll([FpsComponent(), _debugText]);
@@ -144,6 +148,8 @@ class ExampleGame extends SashimiGame
   @override
   void update(double dt) {
     super.update(dt);
+
+    engine.camera.position.setFrom(cube.position);
 
     _debugText.text = '''
 FPS: ${(firstChild<FpsComponent>()?.fps ?? 0).toStringAsFixed(2)}
@@ -155,7 +161,7 @@ Slices: ${descendants().whereType<SashimiSlice>().length}
 Zoom: ${engine.camera.zoom.toStringAsFixed(2)}
 Rotation: ${(engine.camera.rotation * radians2Degrees % 360).toStringAsFixed(2)} degrees
 Tilt: ${(engine.camera.tilt * radians2Degrees % 360).toStringAsFixed(2)} degrees
-Position: ${engine.camera.position.x.toStringAsFixed(2)}, ${engine.camera.position.y.toStringAsFixed(2)}
+Position: ${engine.camera.position.x.toStringAsFixed(2)}, ${engine.camera.position.y.toStringAsFixed(2)}, ${engine.camera.position.z.toStringAsFixed(2)}
 ''';
   }
 
@@ -206,9 +212,9 @@ Position: ${engine.camera.position.x.toStringAsFixed(2)}, ${engine.camera.positi
       final centerRect = size * 0.25 & size * 0.5;
       if (centerRect.containsPoint(_dragStartPosition!)) {
         engine.camera.moveBy(
-          Vector2.copy(-info.delta.game)
-            ..rotate(engine.camera.viewfinder.angle)
-            ..scale(1.0 / engine.camera.viewfinder.zoom),
+          Vector2.copy(-info.delta.game),
+          // ..rotate(engine.camera.rotation)
+          // ..scale(1.0 / engine.camera.zoom),
         );
       } else {
         engine.camera

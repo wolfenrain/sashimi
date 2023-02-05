@@ -8,14 +8,13 @@ import 'package:sashimi/sashimi.dart';
 /// Represents a slice of a [SashimiObject].
 /// {@endtemplate}
 abstract class SashimiSlice<Owner extends SashimiObject>
-    extends PositionComponent with SashimiOwner<Owner> {
+    extends PositionComponent {
   /// {@macro sashimi_slice}
   SashimiSlice({
-    required Owner owner,
+    required this.owner,
     super.anchor = Anchor.center,
+    this.facingCamera = false,
   }) : super() {
-    this.owner = owner;
-
     // The properties needed for priority calculations.
     owner.position.addListener(calculatePriority);
     owner.size.addListener(calculatePriority);
@@ -30,10 +29,20 @@ abstract class SashimiSlice<Owner extends SashimiObject>
     angle = owner.rotation;
   }
 
+  /// The owner object of this component.
+  final Owner owner;
+
+  /// Indicates if this slice is facing the camera or not.
+  bool facingCamera;
+
   /// The engine that this slice is part of.
   SashimiEngine get engine => owner.parent;
 
+  final _renderProjection = Matrix4.zero();
+
   /// Calculate the priority when the [owner] object changes.
+  ///
+  /// TODO(wolfen): rework priority
   void calculatePriority() {
     // Calculate the height of the object.
     final height = owner.size.z * owner.scale.z;
@@ -47,7 +56,6 @@ abstract class SashimiSlice<Owner extends SashimiObject>
         distance - (distance * cos(owner.parent.camera.tilt));
 
     final index = owner.slices.indexOf(this);
-    // final betweenSlices = owner.size.z / owner.slices.length;
 
     priority =
         (owner.position.z + index + distanceBetweenSlices * index).toInt();
@@ -63,14 +71,25 @@ abstract class SashimiSlice<Owner extends SashimiObject>
   @override
   @mustCallSuper
   void renderTree(Canvas canvas) {
-    // Sync the values before rendering otherwise it will be a tick behind.
-    owner.controller.calculatePosition(
-      position,
+    angle = owner.rotation;
+    owner.controller.project(
+      _renderProjection,
       sliceIndex: owner.slices.indexOf(this),
       amountOfSlices: owner.slices.length,
+      facingCamera: facingCamera,
     );
-    angle = owner.rotation;
 
+    // Reset values because the rendering happens through the render projection.
+    position.setZero();
+
+    canvas
+      ..save()
+      // Render using the render projection.
+      ..transform(_renderProjection.storage);
     super.renderTree(canvas);
+    canvas.restore();
+
+    // Restore the position to what the projection says it should be.
+    position.setFrom(_renderProjection.transform2(Vector2.zero()));
   }
 }

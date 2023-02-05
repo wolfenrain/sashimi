@@ -33,7 +33,7 @@ class SashimiEngine extends Component {
   /// This is the world that is rendered on the screen and does not have any
   /// logical behavior like collision detection, that is handled in the
   /// [_logicalWorld].
-  final _visualWorld = CullComponent<SashimiSlice>(cullingEnabled: true);
+  final _visualWorld = CullComponent<SashimiSlice>();
 
   /// The world that contains all the logical components.
   ///
@@ -62,6 +62,8 @@ class SashimiEngine extends Component {
   set fidelity(int value) {
     assert(fidelity >= 1 && fidelity <= 8, 'Fidelity must be between 1 and 8');
     _fidelity = value;
+
+    // TODO(wolfen): clear the cull component when regenerating
 
     for (final object in _objects) {
       object.regenerate();

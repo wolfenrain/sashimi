@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/widgets.dart';
@@ -17,6 +15,10 @@ import 'package:sashimi/sashimi.dart';
 /// the 2D properties that this controller exposes.
 /// {@endtemplate}
 mixin SashimiController on Component {
+  late final SashimiObject object;
+
+  bool facingCamera = false;
+
   /// The tracker for this controller.
   ///
   /// This is used to track the position of the object in the logical world.
@@ -51,46 +53,53 @@ mixin SashimiController on Component {
   /// The camera of the engine.
   SashimiCamera get camera => engine.camera;
 
-  /// Calculate the position in 2D space for a given slice.
-  void calculatePosition(
-    Vector2 out, {
+  final Matrix4 _projection = Matrix4.zero();
+
+  /// Project the rendering on the [out] Matrix.
+  void project(
+    Matrix4 out, {
     int sliceIndex = 0,
     int amountOfSlices = 2,
+    bool facingCamera = false,
   }) {
     // Calculate the height of the object.
     final height = size3D.z * scale3D.z;
-
-    // Evenly space the slices over the height.
     final distance = height / (amountOfSlices == 1 ? 1 : amountOfSlices - 1);
 
-    // Calculate the distance between the slices with tilting in mind.
-    final distanceBetweenSlices = distance - (distance * cos(camera.tilt));
+    // If it is facing the camera we can just calculate the matrix backwards.
+    if (facingCamera) {
+      return out.build(
+        positionX: position3D.x,
+        positionY: position3D.y,
+        positionZ: -position3D.z - distance * sliceIndex,
+        rotationX: camera.tilt + 90 * degrees2Radians,
+        rotationZ: camera.rotation - 90 * degrees2Radians,
+      );
+    }
 
-    // Calculate the tilted position of the object.
-    final tiltedOffset = position3D.z - position3D.z * cos(camera.tilt);
+    // Scaling negatively on the y-axis so that the tilting angles are:
+    // 90 degrees = top
+    // 0 degrees = front
+    final scale = Matrix4.identity()..build(scaleZ: -1);
 
-    /// The slice offset with tilting in mind.
-    final offset = tiltedOffset + distanceBetweenSlices * sliceIndex;
+    // Transform with the slice index taken into account.
+    final transform = Matrix4.identity()
+      ..build(
+        positionX: position3D.x,
+        positionY: position3D.y,
+        positionZ: position3D.z + distance * sliceIndex,
+      );
 
-    return out.setValues(
-      // position3D.x +
-      //     offset *
-      //         cos(camera.rotation - 90 * degrees2Radians) *
-      //         cos(camera.tilt),
-      // position3D.y +
-      //     offset *
-      //         sin(camera.rotation - 90 * degrees2Radians) *
-      //         cos(camera.tilt),
-      sin(camera.rotation) / cos(camera.tilt) * offset + position3D.x,
-      -cos(camera.rotation) / cos(camera.tilt) * offset + position3D.y,
-    );
+    out.setFrom(scale..multiply(transform));
   }
 
   @override
   @mustCallSuper
   void update(double dt) {
     super.update(dt);
-    calculatePosition(position2D);
+
+    project(_projection, facingCamera: facingCamera);
+    position2D.setFrom(_projection.transform2(Vector2.zero()));
   }
 }
 
@@ -109,7 +118,12 @@ class _ControllerTracker implements PositionProvider {
 }
 
 class PositionedController extends PositionComponent with SashimiController {
-  PositionedController({super.anchor = Anchor.center});
+  PositionedController({
+    super.anchor = Anchor.center,
+    bool facingCamera = false,
+  }) {
+    this.facingCamera = facingCamera;
+  }
 
   @override
   void renderTree(Canvas canvas) {

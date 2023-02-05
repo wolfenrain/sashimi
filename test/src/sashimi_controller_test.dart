@@ -13,21 +13,25 @@ class _TestObject extends SashimiObject {
 void main() {
   group('SashimiController', () {
     sashimiGame.testGameWidget(
-      'realigns with owner',
+      'owner syncs correctly with controller',
       setUp: (game, tester) => game.ensureAdd(_TestObject()),
       verify: (game, tester) async {
         final object = game.descendants().whereType<_TestObject>().first;
         final controller = object.controller;
 
-        expect(controller.position, equals(Vector2.zero()));
-        expect(controller.size, equals(Vector2.all(10)));
+        expect(controller.position2D, equals(Vector2.zero()));
+        expect(controller.position3D, equals(Vector3.zero()));
+        expect(controller.size2D, equals(Vector2.all(10)));
+        expect(controller.size3D, equals(Vector3.all(10)));
 
         object.position.setValues(10, 10, 10);
         object.size.setValues(20, 20, 20);
 
         game.update(0);
-        expect(controller.position, equals(Vector2(10, 10)));
-        expect(controller.size, equals(Vector2.all(20)));
+        expect(controller.position3D, equals(Vector3.all(10)));
+        expect(controller.position2D, equals(Vector2.all(10)));
+        expect(controller.size3D, equals(Vector3.all(20)));
+        expect(controller.size2D, equals(Vector2.all(20)));
       },
     );
   });

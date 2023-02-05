@@ -9,26 +9,29 @@ import 'package:sashimi/sashimi.dart';
 /// The game that provides pseudo 3D features.
 /// {@endtemplate}
 class SashimiGame extends game.FlameGame {
+  /// {@macro sashimi_game}
+  SashimiGame({
+    SashimiEngine? engine,
+  }) : _engine = engine ?? SashimiEngine();
+
   @override
-  @Deprecated('Sashimi does not use the built-in camera, use `kamera` instead.')
+  @Deprecated(
+    'Sashimi does not use the built-in camera, use `engine.camera` instead.',
+  )
   game.Camera get camera => super.camera;
 
   /// The camera component that is used to render the world.
+  @Deprecated('use `engine.camera` instead.')
   SashimiCamera get kamera => _engine.camera;
 
-  final SashimiEngine _engine = SashimiEngine();
+  final SashimiEngine _engine;
 
-  /// The engine that is used to render the game.
-  @visibleForTesting
+  /// The engine that powers the Sashimi game.
   SashimiEngine get engine => _engine;
 
   /// Whether the visual world should cull components.
   bool get visualCulling => _engine.visualCulling;
   set visualCulling(bool value) => _engine.visualCulling = value;
-
-  /// Whether the logical world should cull components.
-  bool get logicalCulling => _engine.logicalCulling;
-  set logicalCulling(bool value) => _engine.logicalCulling = value;
 
   /// Debug mode for the visual world.
   bool get debugVisual => _engine.debugVisual;

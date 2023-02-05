@@ -22,7 +22,7 @@ void main() {
       verify: (game, tester) async {
         final object = game.descendants().whereType<Model>().first
           ..position.setValues(10, 10, 10)
-          ..angle = 10 * degrees2Radians;
+          ..rotation = 10 * degrees2Radians;
 
         game
           ..update(0)
@@ -31,7 +31,7 @@ void main() {
         final controller = object.controller;
         final slice = object.slices.first;
 
-        expect(slice.position, equals(controller.position));
+        expect(slice.position, equals(controller.position2D));
       },
     );
 

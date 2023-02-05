@@ -12,5 +12,5 @@ export 'src/sashimi_controller.dart';
 export 'src/sashimi_engine.dart';
 export 'src/sashimi_game.dart';
 export 'src/sashimi_object.dart';
-export 'src/sashimi_owner.dart';
 export 'src/sashimi_slice.dart';
+export 'src/sashimi_world.dart';

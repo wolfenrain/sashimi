@@ -10,11 +10,11 @@ dependencies:
   flame: ^1.6.0
   flutter:
     sdk: flutter
+  meta: ^1.8.0
 
 dev_dependencies:
   flame_test: ^1.9.1
   flutter_test:
     sdk: flutter
-  meta: ^1.8.0
   mocktail: ^0.3.0
   very_good_analysis: ^3.1.0

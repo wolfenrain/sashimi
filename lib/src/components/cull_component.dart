@@ -1,15 +1,14 @@
 import 'dart:async';
 
 import 'package:flame/components.dart';
-import 'package:flame/experimental.dart';
 import 'package:sashimi/sashimi.dart';
 
 /// {@template cull_component}
 /// A component that culls its children based on whether they are inside the
 /// screen or not.
 /// {@endtemplate}
-class CullComponent<T extends SashimiOwner> extends Component
-    with HasGameRef<SashimiGame>, HasAncestor<SashimiEngine> {
+class CullComponent<T extends PositionComponent> extends Component
+    with HasAncestor<SashimiEngine> {
   /// {@macro cull_component}
   CullComponent({
     bool cullingEnabled = false,
@@ -22,7 +21,7 @@ class CullComponent<T extends SashimiOwner> extends Component
   late final List<T> _active;
 
   /// The camera of the engine.
-  CameraComponent get camera => ancestor.camera;
+  SashimiCamera get camera => ancestor.camera;
 
   /// If culling is enabled for this component.
   bool get cullingEnabled => _cullingEnabled;
@@ -83,4 +82,11 @@ class CullComponent<T extends SashimiOwner> extends Component
     // Reorder all children to ensure their priorities are correct after adding.
     reorderChildren();
   }
+
+  // @override
+  // void renderTree(Canvas canvas) {
+  //   // TODO: implement renderTree
+  //   super.renderTree(canvas);
+  //   canvas.drawRect(camera.visibleWorldRect, Paint());
+  // }
 }

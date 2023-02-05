@@ -11,24 +11,16 @@ class BillboardSprite extends SashimiObject {
     required this.sprite,
     required Vector2 size,
     Vector2? scale,
-    super.angle,
+    super.rotation,
+    SashimiController? controller,
   }) : super(
           size: Vector3(size.x, size.y, 1),
           scale: Vector3(scale?.x ?? 1, scale?.y ?? 1, 1),
-        ) {
-    controller.anchor = Anchor.bottomCenter;
-  }
+          controller: controller ?? PositionedController(),
+        );
 
   /// The sprite to render.
   final Sprite sprite;
-
-  @override
-  void update(double dt) {
-    // Set the angle to the world rotation and subtract own angle. This
-    // ensures that if angle is set to 0, the sprite will always face the
-    // camera.
-    controller.angle = parent.camera.rotation - angle;
-  }
 
   @override
   List<SashimiSlice<SashimiObject>> generateSlices() {
@@ -36,29 +28,26 @@ class BillboardSprite extends SashimiObject {
   }
 }
 
+/// {@template billboard_controller}
+/// The [SashimiController] for the [BillboardSprite].
+///
+/// It forces the rotation to always be equal to the camera rotation to ensure
+/// it is always facing the player.
+/// {@endtemplate}
+class BillboardController extends PositionedController {
+  /// {@macro billboard_controller}
+  BillboardController({
+    super.anchor = Anchor.bottomCenter,
+    super.facingCamera = true,
+  });
+}
+
 class _SashimiSlice extends SashimiSlice<BillboardSprite> {
-  _SashimiSlice({required super.owner}) : super(anchor: Anchor.bottomCenter);
-
-  @override
-  void calculatePriority() {
-    priority = owner.position.z.toInt();
-  }
-
-  @override
-  void realign() {
-    super.realign();
-
-    // Set the position relative to the position of the controller based on the
-    // anchor (bottom center).
-    position.setFrom(owner.controller.positionOfAnchor(anchor));
-
-    // Set the angle to the controller's angle as that one will always be
-    // visually correct.
-    angle = owner.controller.angle;
-  }
+  _SashimiSlice({required super.owner})
+      : super(anchor: Anchor.bottomCenter, facingCamera: true);
 
   @override
   void render(Canvas canvas) {
-    owner.sprite.render(canvas, size: owner.size.xy);
+    owner.sprite.render(canvas, size: size);
   }
 }

@@ -13,9 +13,10 @@ class Model extends SashimiObject {
     required super.position,
     required super.size,
     super.scale,
-    super.angle,
+    super.rotation,
     required this.image,
     Vector2? sliceSize,
+    super.controller,
   }) : sliceSize = sliceSize ?? size.xy;
 
   /// The image to use for the model.
@@ -25,22 +26,15 @@ class Model extends SashimiObject {
   final Vector2 sliceSize;
 
   @override
-  void update(double dt) {
-    // Update the position of the controller to match the bottom slice of the
-    // model (the first slice in the list).
-    controller.position.setFrom(slices.first.position);
-  }
-
-  @override
   List<SashimiSlice> generateSlices() {
     final sheet = SpriteSheet(image: image, srcSize: sliceSize.xy);
     final slices = (image.height / sliceSize.y).ceil();
 
     return [
-      for (var i = 0; i < slices; i++)
+      for (var i = 0.0; i < slices; i += 1 / engine.fidelity)
         _SashimiSlice(
           owner: this,
-          sprite: sheet.getSpriteById(slices - i - 1),
+          sprite: sheet.getSpriteById(slices - i.floor() - 1),
         ),
     ];
   }

@@ -16,6 +16,7 @@ class Model extends SashimiObject {
     super.angle,
     required this.image,
     Vector2? sliceSize,
+    this.horizontalSlices = false,
   }) : sliceSize = sliceSize ?? size.xy;
 
   /// The image to use for the model.
@@ -23,6 +24,8 @@ class Model extends SashimiObject {
 
   /// The size of the individual slices in the image.
   final Vector2 sliceSize;
+
+  bool horizontalSlices;
 
   @override
   void update(double dt) {
@@ -34,13 +37,17 @@ class Model extends SashimiObject {
   @override
   List<SashimiSlice> generateSlices() {
     final sheet = SpriteSheet(image: image, srcSize: sliceSize.xy);
-    final slices = (image.height / sliceSize.y).ceil();
+    var slices = (image.height / sliceSize.y).ceil();
+
+    if (horizontalSlices) {
+      slices = (image.width / sliceSize.x).ceil();
+    }
 
     return [
       for (var i = 0; i < slices; i++)
         _SashimiSlice(
           owner: this,
-          sprite: sheet.getSpriteById(slices - i - 1),
+          sprite: sheet.getSpriteById(horizontalSlices ? i : (slices - i - 1)),
         ),
     ];
   }

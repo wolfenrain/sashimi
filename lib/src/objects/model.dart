@@ -25,6 +25,7 @@ class Model extends SashimiObject {
   /// The size of the individual slices in the image.
   final Vector2 sliceSize;
 
+  /// The provided spritesheet is layed out in a single horizontal row.
   bool horizontalSlices;
 
   @override
